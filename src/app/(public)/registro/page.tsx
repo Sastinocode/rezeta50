@@ -51,7 +51,7 @@ function InputField({
             'w-full px-4 py-3 rounded-xl border text-sm transition-colors focus:outline-none focus:ring-2',
             error
               ? 'border-red-400 focus:border-red-400 focus:ring-red-100'
-              : 'border-slate-300 focus:border-[#E8A020] focus:ring-[#E8A020]/20',
+              : 'border-slate-300 focus:border-[#F4DF49] focus:ring-[#F4DF49]/20',
             showToggle && 'pr-10'
           )}
         />
@@ -168,8 +168,8 @@ export default function RegistroPage() {
     <div className="min-h-screen bg-slate-50 flex flex-col">
       {/* Header */}
       <header className="px-4 py-4 border-b border-slate-100 bg-white flex items-center gap-2">
-        <span className="text-xl font-black text-[#1A3C5E] tracking-tight">Rezeta</span>
-        <span className="text-xs font-bold px-1.5 py-0.5 rounded" style={{ background: '#E8A020', color: 'white' }}>
+        <span className="text-xl font-black text-[#111111] tracking-tight">Rezeta</span>
+        <span className="text-xs font-bold px-1.5 py-0.5 rounded" style={{ background: '#F4DF49', color: '#111111' }}>
           50
         </span>
       </header>
@@ -180,7 +180,7 @@ export default function RegistroPage() {
           {/* Headline contextual */}
           <div className="text-center mb-6">
             <div className="text-4xl mb-3">🎉</div>
-            <h1 className="text-2xl font-black text-[#1A3C5E] leading-tight">
+            <h1 className="text-2xl font-black text-[#111111] leading-tight">
               Tu valoración está lista.
             </h1>
             <p className="text-slate-500 text-sm mt-2">
@@ -200,7 +200,7 @@ export default function RegistroPage() {
                   className={cn(
                     'flex-1 py-3.5 text-sm font-semibold transition-all',
                     tab === t
-                      ? 'text-[#1A3C5E] border-b-2 border-[#E8A020] bg-white'
+                      ? 'text-[#111111] border-b-2 border-[#F4DF49] bg-white'
                       : 'text-slate-400 hover:text-slate-600'
                   )}
                 >
@@ -245,11 +245,11 @@ export default function RegistroPage() {
                       <input
                         type="checkbox"
                         {...registerForm.register('rgpd')}
-                        className="mt-0.5 w-4 h-4 rounded border-slate-300 accent-[#E8A020] flex-shrink-0"
+                        className="mt-0.5 w-4 h-4 rounded border-slate-300 accent-[#F4DF49] flex-shrink-0"
                       />
                       <span className="text-xs text-slate-600 leading-relaxed">
                         Acepto la{' '}
-                        <span className="underline text-[#1A3C5E]">Política de Privacidad</span>
+                        <span className="underline text-[#111111]">Política de Privacidad</span>
                         {' '}y el tratamiento de mis datos de salud con fines de orientación preventiva.
                       </span>
                     </label>
@@ -264,8 +264,8 @@ export default function RegistroPage() {
                   <button
                     type="submit"
                     disabled={loading}
-                    className="w-full py-4 rounded-xl font-bold text-white transition-all disabled:opacity-60 flex items-center justify-center gap-2"
-                    style={{ background: '#E8A020' }}
+                    className="w-full py-4 rounded-xl font-bold text-[#111111] transition-all disabled:opacity-60 flex items-center justify-center gap-2"
+                    style={{ background: '#F4DF49' }}
                   >
                     {loading ? (
                       <>
@@ -306,7 +306,7 @@ export default function RegistroPage() {
                     type="submit"
                     disabled={loading}
                     className="w-full py-4 rounded-xl font-bold text-white transition-all disabled:opacity-60 flex items-center justify-center gap-2"
-                    style={{ background: '#1A3C5E' }}
+                    style={{ background: '#111111' }}
                   >
                     {loading ? (
                       <><Loader2 size={18} className="animate-spin" /> Accediendo…</>

@@ -63,7 +63,7 @@ export default function ZoneCard({ result }: ZoneCardProps) {
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <span className="text-lg" role="img" aria-label={cfg.label}>{cfg.emoji}</span>
-          <span className="font-bold text-[#1A3C5E] text-sm">{fullName}</span>
+          <span className="font-bold text-[#111111] text-sm">{fullName}</span>
         </div>
         <span className={`text-xs font-semibold px-2 py-0.5 rounded-full ${cfg.badge}`}>
           {cfg.label}
@@ -74,7 +74,7 @@ export default function ZoneCard({ result }: ZoneCardProps) {
       <div>
         <div className="flex justify-between items-center mb-1">
           <span className="text-xs text-slate-500">Nivel de afectación</span>
-          <span className="text-sm font-black text-[#1A3C5E]">{result.score}<span className="text-xs font-normal text-slate-400">/100</span></span>
+          <span className="text-sm font-black text-[#111111]">{result.score}<span className="text-xs font-normal text-slate-400">/100</span></span>
         </div>
         <div className="w-full h-2.5 bg-white rounded-full border border-slate-200 overflow-hidden">
           <div

@@ -28,11 +28,11 @@ export default function ProgramCard({ program }: ProgramCardProps) {
   const phaseColor = PHASE_COLORS[program.phase] ?? 'bg-slate-100 text-slate-600'
 
   return (
-    <div className="rounded-2xl border border-slate-200 bg-white p-4 space-y-3 hover:border-[#E8A020]/60 hover:shadow-sm transition-all">
+    <div className="rounded-2xl border border-slate-200 bg-white p-4 space-y-3 hover:border-[#F4DF49]/60 hover:shadow-sm transition-all">
       {/* Cabecera */}
       <div className="flex items-start justify-between gap-2">
         <div className="flex-1 min-w-0">
-          <h3 className="font-bold text-[#1A3C5E] text-sm leading-snug">{program.name}</h3>
+          <h3 className="font-bold text-[#111111] text-sm leading-snug">{program.name}</h3>
           {program.description && (
             <p className="text-xs text-slate-500 mt-0.5 line-clamp-2">{program.description}</p>
           )}
@@ -45,15 +45,15 @@ export default function ProgramCard({ program }: ProgramCardProps) {
       {/* Datos del programa */}
       <div className="flex flex-wrap gap-3">
         <span className="flex items-center gap-1 text-xs text-slate-500">
-          <Clock size={12} className="text-[#E8A020]" />
+          <Clock size={12} className="text-[#111111]" />
           {program.duration_weeks} semanas · {program.sessions_week}x/semana
         </span>
         <span className="flex items-center gap-1 text-xs text-slate-500">
-          <Euro size={12} className="text-[#E8A020]" />
+          <Euro size={12} className="text-[#111111]" />
           {program.price_eur === 0 ? 'Gratis' : `${program.price_eur} €`}
         </span>
         <span className="flex items-center gap-1 text-xs text-slate-500">
-          <BarChart2 size={12} className="text-[#E8A020]" />
+          <BarChart2 size={12} className="text-[#111111]" />
           Compatibilidad: {Math.min(program.match_score, 100)}%
         </span>
       </div>

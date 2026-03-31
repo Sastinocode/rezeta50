@@ -51,10 +51,10 @@ export default async function PerfilPage() {
       {/* Header */}
       <header className="px-4 py-4 bg-white border-b border-slate-100 flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <span className="text-xl font-black text-[#1A3C5E] tracking-tight">Rezeta</span>
+          <span className="text-xl font-black text-[#111111] tracking-tight">Rezeta</span>
           <span
             className="text-xs font-bold px-1.5 py-0.5 rounded"
-            style={{ background: '#E8A020', color: 'white' }}
+            style={{ background: '#F4DF49', color: '#111111' }}
           >
             50
           </span>
@@ -74,23 +74,23 @@ export default async function PerfilPage() {
       <main className="flex-1 max-w-lg mx-auto w-full px-4 py-8 space-y-6">
         {/* Saludo */}
         <div>
-          <h1 className="text-2xl font-black text-[#1A3C5E]">Mi perfil</h1>
+          <h1 className="text-2xl font-black text-[#111111]">Mi perfil</h1>
           <p className="text-sm text-slate-500 mt-1">{user.email}</p>
         </div>
 
         {/* Nueva valoración */}
         <Link
           href="/cuestionario"
-          className="flex items-center gap-3 p-4 rounded-2xl border-2 border-dashed border-[#E8A020]/50 bg-[#FDF3DF]/50 hover:border-[#E8A020] hover:bg-[#FDF3DF] transition-all"
+          className="flex items-center gap-3 p-4 rounded-2xl border-2 border-dashed border-[#F4DF49]/50 bg-[#FAFBE8]/50 hover:border-[#F4DF49] hover:bg-[#FAFBE8] transition-all"
         >
           <span
             className="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0"
-            style={{ background: '#E8A020' }}
+            style={{ background: '#F4DF49' }}
           >
             <PlusCircle size={20} color="white" />
           </span>
           <div>
-            <p className="font-bold text-[#1A3C5E] text-sm">Hacer nueva valoración</p>
+            <p className="font-bold text-[#111111] text-sm">Hacer nueva valoración</p>
             <p className="text-xs text-slate-500">Repite el cuestionario cuando quieras</p>
           </div>
         </Link>
@@ -118,7 +118,7 @@ export default async function PerfilPage() {
                   <Link
                     key={report.id}
                     href={`/informe/${report.id}`}
-                    className="flex items-center gap-4 p-4 bg-white rounded-2xl border border-slate-200 hover:border-[#E8A020]/40 hover:shadow-sm transition-all"
+                    className="flex items-center gap-4 p-4 bg-white rounded-2xl border border-slate-200 hover:border-[#F4DF49]/40 hover:shadow-sm transition-all"
                   >
                     {/* Score */}
                     <div
@@ -139,7 +139,7 @@ export default async function PerfilPage() {
 
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 mb-0.5">
-                        <span className="font-semibold text-[#1A3C5E] text-sm">
+                        <span className="font-semibold text-[#111111] text-sm">
                           Valoración #{safeReports.indexOf(report) + 1}
                         </span>
                         {data?.global_level && <LevelBadge level={data.global_level} />}

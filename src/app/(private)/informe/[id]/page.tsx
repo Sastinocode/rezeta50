@@ -74,17 +74,17 @@ export default async function InformePage({
       <header className="px-4 py-4 bg-white border-b border-slate-100 flex items-center gap-3">
         <Link
           href="/perfil"
-          className="flex items-center gap-1 text-sm text-slate-500 hover:text-[#1A3C5E] transition-colors"
+          className="flex items-center gap-1 text-sm text-slate-500 hover:text-[#111111] transition-colors"
         >
           <ChevronLeft size={16} />
           Mis valoraciones
         </Link>
         <div className="flex-1" />
         <div className="flex items-center gap-2">
-          <span className="text-base font-black text-[#1A3C5E] tracking-tight">Rezeta</span>
+          <span className="text-base font-black text-[#111111] tracking-tight">Rezeta</span>
           <span
             className="text-xs font-bold px-1.5 py-0.5 rounded"
-            style={{ background: '#E8A020', color: 'white' }}
+            style={{ background: '#F4DF49', color: '#111111' }}
           >
             50
           </span>
@@ -94,7 +94,7 @@ export default async function InformePage({
       <main className="flex-1 max-w-lg mx-auto w-full px-4 py-8 space-y-8">
         {/* Título */}
         <div>
-          <h1 className="text-2xl font-black text-[#1A3C5E]">Tu informe MSK</h1>
+          <h1 className="text-2xl font-black text-[#111111]">Tu informe MSK</h1>
           <p className="text-xs text-slate-400 mt-1">
             Generado el {formatDate(report.created_at)}
           </p>
@@ -145,8 +145,8 @@ export default async function InformePage({
         )}
 
         {/* ── CTA presencial ─────────────────────────────────────── */}
-        <section className="rounded-2xl border-2 border-dashed border-[#E8A020]/40 bg-[#FDF3DF]/50 p-5 text-center space-y-3">
-          <p className="text-sm font-bold text-[#1A3C5E]">
+        <section className="rounded-2xl border-2 border-dashed border-[#F4DF49]/40 bg-[#FAFBE8]/50 p-5 text-center space-y-3">
+          <p className="text-sm font-bold text-[#111111]">
             ¿Quieres una valoración presencial en Zincuenta?
           </p>
           <p className="text-xs text-slate-500">
@@ -157,7 +157,7 @@ export default async function InformePage({
             target="_blank"
             rel="noopener noreferrer"
             className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-bold text-white transition-all"
-            style={{ background: '#1A3C5E' }}
+            style={{ background: '#111111' }}
           >
             Visitar Zincuenta
             <ExternalLink size={14} />
@@ -168,7 +168,7 @@ export default async function InformePage({
         <div className="text-center">
           <Link
             href="/cuestionario"
-            className="text-sm font-semibold text-[#E8A020] hover:underline"
+            className="text-sm font-semibold text-[#111111] hover:underline"
           >
             + Hacer nueva valoración
           </Link>

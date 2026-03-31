@@ -63,16 +63,16 @@ export default function AdminProgramasPage() {
       {/* Cabecera */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <Link href="/admin" className="flex items-center gap-1 text-xs text-slate-500 hover:text-[#1A3C5E] mb-1">
+          <Link href="/admin" className="flex items-center gap-1 text-xs text-slate-500 hover:text-[#111111] mb-1">
             <ChevronLeft size={14} /> Panel admin
           </Link>
-          <h1 className="text-2xl font-black text-[#1A3C5E]">Programas Harbiz</h1>
+          <h1 className="text-2xl font-black text-[#111111]">Programas Harbiz</h1>
           <p className="text-sm text-slate-500">{programs.length} programas · {programs.filter(p => p.active).length} activos</p>
         </div>
         <button
           onClick={() => setModal({ open: true, program: null })}
-          className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-bold text-white"
-          style={{ background: '#E8A020' }}
+          className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-bold text-[#111111]"
+          style={{ background: '#F4DF49' }}
         >
           <Plus size={16} />
           Nuevo programa
@@ -102,7 +102,7 @@ export default function AdminProgramasPage() {
                 {programs.map((p) => (
                   <tr key={p.id} className="border-b border-slate-50 hover:bg-slate-50 transition-colors">
                     <td className="px-4 py-3">
-                      <span className="font-semibold text-[#1A3C5E] text-sm">{p.name}</span>
+                      <span className="font-semibold text-[#111111] text-sm">{p.name}</span>
                     </td>
                     <td className="px-4 py-3 hidden md:table-cell">
                       <div className="flex flex-wrap gap-1">
@@ -139,7 +139,7 @@ export default function AdminProgramasPage() {
                     <td className="px-4 py-3">
                       <button
                         onClick={() => setModal({ open: true, program: p })}
-                        className="flex items-center gap-1 text-xs font-semibold text-[#E8A020] hover:text-[#B87A10] transition-colors"
+                        className="flex items-center gap-1 text-xs font-semibold text-[#111111] hover:text-[#B87A10] transition-colors"
                       >
                         <Edit2 size={13} /> Editar
                       </button>

@@ -44,12 +44,12 @@ const config: Config = {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
-        // Rezeta brand colors
+        // Rezeta brand colors (Zincuenta palette)
         rezeta: {
-          accent: '#E8A020',   // naranja dorado — CTA, selecciones, activos
-          navy:   '#1A3C5E',   // azul marino  — textos principales, header
-          'accent-light': '#FDF3DF', // fondo accent suave
-          'navy-light': '#EEF3F8',   // fondo navy suave
+          accent: '#F4DF49',   // amarillo Zincuenta — CTA, selecciones, activos
+          navy:   '#111111',   // negro — textos principales, header
+          'accent-light': '#FAFBE8', // fondo accent suave
+          'navy-light': '#F5F5F5',   // fondo navy suave
         },
         // Semáforo
         verde: '#22c55e',

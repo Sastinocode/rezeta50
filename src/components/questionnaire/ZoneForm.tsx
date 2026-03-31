@@ -78,11 +78,11 @@ function RadioGroup({ options, value, onChange, error, cols = 4 }: RadioGroupPro
               className={cn(
                 'flex flex-col items-start p-3 rounded-xl border-2 text-left transition-all',
                 selected
-                  ? 'border-[#E8A020] bg-[#FDF3DF] text-[#1A3C5E]'
-                  : 'border-slate-200 bg-white hover:border-[#E8A020]/50 hover:bg-[#FDF3DF]/50'
+                  ? 'border-[#F4DF49] bg-[#FAFBE8] text-[#111111]'
+                  : 'border-slate-200 bg-white hover:border-[#F4DF49]/50 hover:bg-[#FAFBE8]/50'
               )}
             >
-              <span className={cn('text-sm font-semibold', selected ? 'text-[#1A3C5E]' : 'text-slate-700')}>
+              <span className={cn('text-sm font-semibold', selected ? 'text-[#111111]' : 'text-slate-700')}>
                 {opt.label}
               </span>
               {opt.desc && (
@@ -160,7 +160,7 @@ export default function ZoneForm({
 
   return (
     <form onSubmit={handleSubmit(submit)} className="space-y-6">
-      <h2 className="text-lg font-bold text-[#1A3C5E]">{zoneName}</h2>
+      <h2 className="text-lg font-bold text-[#111111]">{zoneName}</h2>
 
       {/* 1. Nivel de dolor */}
       <div>
@@ -287,8 +287,8 @@ export default function ZoneForm({
                   className={cn(
                     'flex-1 py-3 rounded-xl border-2 font-semibold text-sm transition-all',
                     field.value === opt.value
-                      ? 'border-[#E8A020] bg-[#FDF3DF] text-[#1A3C5E]'
-                      : 'border-slate-200 bg-white hover:border-[#E8A020]/50'
+                      ? 'border-[#F4DF49] bg-[#FAFBE8] text-[#111111]'
+                      : 'border-slate-200 bg-white hover:border-[#F4DF49]/50'
                   )}
                 >
                   {opt.label}
@@ -306,7 +306,7 @@ export default function ZoneForm({
                 {...field}
                 type="text"
                 placeholder="¿Cuál? (opcional)"
-                className="mt-2 w-full px-3 py-2 rounded-lg border border-slate-300 text-sm focus:outline-none focus:border-[#E8A020] focus:ring-1 focus:ring-[#E8A020]"
+                className="mt-2 w-full px-3 py-2 rounded-lg border border-slate-300 text-sm focus:outline-none focus:border-[#F4DF49] focus:ring-1 focus:ring-[#F4DF49]"
               />
             )}
           />
@@ -344,7 +344,7 @@ export default function ZoneForm({
         </button>
         <button
           type="submit"
-          className="flex-[2] py-3 rounded-xl bg-[#E8A020] hover:bg-[#CF8F1A] text-white font-bold transition-all"
+          className="flex-[2] py-3 rounded-xl bg-[#F4DF49] hover:bg-[#d4c93a] text-white font-bold transition-all"
         >
           {isLast ? 'Última zona ✓' : 'Siguiente zona →'}
         </button>

@@ -125,13 +125,13 @@ export default async function AdminPage({
       {/* Cabecera */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-black text-[#1A3C5E]">Panel de Administración</h1>
+          <h1 className="text-2xl font-black text-[#111111]">Panel de Administración</h1>
           <p className="text-sm text-slate-500 mt-1">Cuestionarios completados por usuarios</p>
         </div>
         <Link
           href="/admin/programas"
-          className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-bold text-white"
-          style={{ background: '#E8A020' }}
+          className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-bold text-[#111111]"
+          style={{ background: '#F4DF49' }}
         >
           <BarChart2 size={16} />
           Gestionar programas
@@ -147,7 +147,7 @@ export default async function AdminPage({
           { label: 'Usuarios únicos', value: new Set(rows.map(r => r.user_id)).size, icon: <Users size={16} /> },
         ].map((s, i) => (
           <div key={i} className="bg-white rounded-2xl border border-slate-200 p-4">
-            <div className="text-2xl font-black text-[#1A3C5E]">{s.value}</div>
+            <div className="text-2xl font-black text-[#111111]">{s.value}</div>
             <div className={`text-xs text-slate-500 mt-1 ${s.color ?? ''}`}>{s.label}</div>
           </div>
         ))}
@@ -161,7 +161,7 @@ export default async function AdminPage({
             href={`/admin?nivel=${n}&page=1`}
             className={`px-3 py-1.5 rounded-lg text-xs font-semibold border transition-all ${
               nivelFilter === n
-                ? 'bg-[#1A3C5E] text-white border-[#1A3C5E]'
+                ? 'bg-[#111111] text-white border-[#111111]'
                 : 'bg-white text-slate-600 border-slate-200 hover:border-slate-400'
             }`}
           >
@@ -214,7 +214,7 @@ export default async function AdminPage({
                       </div>
                     </td>
                     <td className="px-4 py-3">
-                      <span className="font-black text-[#1A3C5E]">{r.global_score}</span>
+                      <span className="font-black text-[#111111]">{r.global_score}</span>
                       <span className="text-slate-400 text-xs">/100</span>
                     </td>
                     <td className="px-4 py-3">
@@ -225,7 +225,7 @@ export default async function AdminPage({
                     <td className="px-4 py-3">
                       <Link
                         href={`/informe/${r.id}`}
-                        className="text-xs font-semibold text-[#E8A020] hover:underline whitespace-nowrap"
+                        className="text-xs font-semibold text-[#111111] hover:underline whitespace-nowrap"
                       >
                         Ver informe →
                       </Link>

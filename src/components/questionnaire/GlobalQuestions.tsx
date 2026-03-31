@@ -83,20 +83,20 @@ function OptionCard({ icon: Icon, label, desc, selected, onClick, multi }: Optio
       className={cn(
         'flex items-center gap-3 p-4 rounded-xl border-2 text-left w-full transition-all',
         selected
-          ? 'border-[#E8A020] bg-[#FDF3DF]'
-          : 'border-slate-200 bg-white hover:border-[#E8A020]/40 hover:bg-[#FDF3DF]/30'
+          ? 'border-[#F4DF49] bg-[#FAFBE8]'
+          : 'border-slate-200 bg-white hover:border-[#F4DF49]/40 hover:bg-[#FAFBE8]/30'
       )}
     >
       <span
         className={cn(
           'flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center',
-          selected ? 'bg-[#E8A020] text-white' : 'bg-slate-100 text-slate-500'
+          selected ? 'bg-[#F4DF49] text-white' : 'bg-slate-100 text-slate-500'
         )}
       >
         <Icon size={18} />
       </span>
       <span className="flex-1 min-w-0">
-        <span className={cn('block text-sm font-semibold', selected ? 'text-[#1A3C5E]' : 'text-slate-700')}>
+        <span className={cn('block text-sm font-semibold', selected ? 'text-[#111111]' : 'text-slate-700')}>
           {label}
         </span>
         {desc && (
@@ -104,7 +104,7 @@ function OptionCard({ icon: Icon, label, desc, selected, onClick, multi }: Optio
         )}
       </span>
       {multi && selected && (
-        <span className="flex-shrink-0 w-5 h-5 rounded bg-[#E8A020] flex items-center justify-center">
+        <span className="flex-shrink-0 w-5 h-5 rounded bg-[#F4DF49] flex items-center justify-center">
           <Check size={12} color="white" />
         </span>
       )}
@@ -165,10 +165,10 @@ export default function GlobalQuestions({
   return (
     <div className="space-y-5">
       <div>
-        <p className="text-xs font-semibold text-[#E8A020] uppercase tracking-wider mb-1">
+        <p className="text-xs font-semibold text-[#111111] uppercase tracking-wider mb-1">
           Pregunta {questionIndex + 1} de 4
         </p>
-        <h2 className="text-xl font-bold text-[#1A3C5E] leading-tight">{q.title}</h2>
+        <h2 className="text-xl font-bold text-[#111111] leading-tight">{q.title}</h2>
         <p className="text-sm text-slate-500 mt-1">{q.subtitle}</p>
       </div>
 
@@ -224,18 +224,18 @@ export default function GlobalQuestions({
               className={cn(
                 'flex flex-col items-center gap-2 py-5 rounded-xl border-2 transition-all',
                 answers.age_range === opt.value
-                  ? 'border-[#E8A020] bg-[#FDF3DF]'
-                  : 'border-slate-200 bg-white hover:border-[#E8A020]/40'
+                  ? 'border-[#F4DF49] bg-[#FAFBE8]'
+                  : 'border-slate-200 bg-white hover:border-[#F4DF49]/40'
               )}
             >
               <opt.icon
                 size={24}
-                className={answers.age_range === opt.value ? 'text-[#E8A020]' : 'text-slate-400'}
+                className={answers.age_range === opt.value ? 'text-[#111111]' : 'text-slate-400'}
               />
               <span
                 className={cn(
                   'text-sm font-semibold',
-                  answers.age_range === opt.value ? 'text-[#1A3C5E]' : 'text-slate-700'
+                  answers.age_range === opt.value ? 'text-[#111111]' : 'text-slate-700'
                 )}
               >
                 {opt.label}
@@ -256,15 +256,15 @@ export default function GlobalQuestions({
               className={cn(
                 'flex items-center gap-4 w-full p-4 rounded-xl border-2 transition-all',
                 answers.floor_exercises === opt.value
-                  ? 'border-[#E8A020] bg-[#FDF3DF]'
-                  : 'border-slate-200 bg-white hover:border-[#E8A020]/40'
+                  ? 'border-[#F4DF49] bg-[#FAFBE8]'
+                  : 'border-slate-200 bg-white hover:border-[#F4DF49]/40'
               )}
             >
               <span
                 className={cn(
                   'w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0',
                   answers.floor_exercises === opt.value
-                    ? 'bg-[#E8A020] text-white'
+                    ? 'bg-[#F4DF49] text-white'
                     : 'bg-slate-100 text-slate-500'
                 )}
               >
@@ -273,7 +273,7 @@ export default function GlobalQuestions({
               <span
                 className={cn(
                   'text-base font-semibold',
-                  answers.floor_exercises === opt.value ? 'text-[#1A3C5E]' : 'text-slate-700'
+                  answers.floor_exercises === opt.value ? 'text-[#111111]' : 'text-slate-700'
                 )}
               >
                 {opt.label}
@@ -299,7 +299,7 @@ export default function GlobalQuestions({
           className={cn(
             'flex-[2] py-3 rounded-xl font-bold transition-all',
             canContinue()
-              ? 'bg-[#E8A020] hover:bg-[#CF8F1A] text-white'
+              ? 'bg-[#F4DF49] hover:bg-[#d4c93a] text-white'
               : 'bg-slate-200 text-slate-400 cursor-not-allowed'
           )}
         >

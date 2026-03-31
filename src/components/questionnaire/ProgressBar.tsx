@@ -58,8 +58,8 @@ export default function ProgressBar({
               <div
                 className={cn(
                   'w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0 transition-all',
-                  isDone    && 'bg-[#E8A020] text-white',
-                  isCurrent && 'bg-[#1A3C5E] text-white ring-2 ring-[#1A3C5E]/20',
+                  isDone    && 'bg-[#F4DF49] text-white',
+                  isCurrent && 'bg-[#111111] text-white ring-2 ring-[#111111]/20',
                   !isDone && !isCurrent && 'bg-slate-200 text-slate-400'
                 )}
               >
@@ -69,7 +69,7 @@ export default function ProgressBar({
               <span
                 className={cn(
                   'ml-1.5 text-xs font-medium hidden sm:block',
-                  isCurrent ? 'text-[#1A3C5E]' : isDone ? 'text-[#E8A020]' : 'text-slate-400'
+                  isCurrent ? 'text-[#111111]' : isDone ? 'text-[#111111]' : 'text-slate-400'
                 )}
               >
                 {step.label}
@@ -79,7 +79,7 @@ export default function ProgressBar({
                 <div
                   className={cn(
                     'flex-1 h-0.5 mx-2 rounded transition-all',
-                    idx < stepIndex ? 'bg-[#E8A020]' : 'bg-slate-200'
+                    idx < stepIndex ? 'bg-[#F4DF49]' : 'bg-slate-200'
                   )}
                 />
               )}
@@ -91,7 +91,7 @@ export default function ProgressBar({
       {/* Barra de progreso */}
       <div className="w-full bg-slate-100 rounded-full h-2 overflow-hidden">
         <div
-          className="h-2 rounded-full bg-[#E8A020] transition-all duration-500"
+          className="h-2 rounded-full bg-[#F4DF49] transition-all duration-500"
           style={{ width: `${pct}%` }}
         />
       </div>

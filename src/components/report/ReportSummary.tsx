@@ -255,7 +255,7 @@ export default function ReportSummary({
           >
             {cfg.label}
           </div>
-          <h2 className="text-base font-bold text-[#1A3C5E] leading-snug">{cfg.headline}</h2>
+          <h2 className="text-base font-bold text-[#111111] leading-snug">{cfg.headline}</h2>
           <p className="text-xs text-slate-500 mt-0.5">{cfg.subtext}</p>
         </div>
       </div>

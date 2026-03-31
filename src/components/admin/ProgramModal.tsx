@@ -135,7 +135,7 @@ export default function ProgramModal({ program, onClose, onSaved }: ProgramModal
     `w-full px-3 py-2 rounded-xl border text-sm focus:outline-none focus:ring-2 ${
       hasError
         ? 'border-red-400 focus:ring-red-100'
-        : 'border-slate-300 focus:border-[#E8A020] focus:ring-[#E8A020]/20'
+        : 'border-slate-300 focus:border-[#F4DF49] focus:ring-[#F4DF49]/20'
     }`
 
   return (
@@ -148,7 +148,7 @@ export default function ProgramModal({ program, onClose, onSaved }: ProgramModal
       <div className="bg-white rounded-2xl shadow-xl w-full max-w-lg max-h-[90vh] overflow-y-auto">
         {/* Header modal */}
         <div className="flex items-center justify-between p-5 border-b border-slate-100">
-          <h2 className="font-bold text-[#1A3C5E]">
+          <h2 className="font-bold text-[#111111]">
             {isEdit ? 'Editar programa' : 'Nuevo programa'}
           </h2>
           <button
@@ -194,7 +194,7 @@ export default function ProgramModal({ program, onClose, onSaved }: ProgramModal
                         key={z.value}
                         className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border text-xs font-medium cursor-pointer transition-all ${
                           checked
-                            ? 'bg-[#E8A020]/10 border-[#E8A020] text-[#1A3C5E]'
+                            ? 'bg-[#F4DF49]/10 border-[#F4DF49] text-[#111111]'
                             : 'bg-white border-slate-200 text-slate-500 hover:border-slate-400'
                         }`}
                       >
@@ -276,7 +276,7 @@ export default function ProgramModal({ program, onClose, onSaved }: ProgramModal
                 <label className="flex items-center gap-2 cursor-pointer">
                   <div
                     onClick={() => field.onChange(!field.value)}
-                    className={`w-9 h-5 rounded-full transition-colors flex-shrink-0 ${field.value ? 'bg-[#E8A020]' : 'bg-slate-300'}`}
+                    className={`w-9 h-5 rounded-full transition-colors flex-shrink-0 ${field.value ? 'bg-[#F4DF49]' : 'bg-slate-300'}`}
                   >
                     <div className={`w-4 h-4 bg-white rounded-full m-0.5 transition-transform ${field.value ? 'translate-x-4' : 'translate-x-0'}`} />
                   </div>
@@ -314,7 +314,7 @@ export default function ProgramModal({ program, onClose, onSaved }: ProgramModal
               type="submit"
               disabled={isSubmitting}
               className="flex-1 py-3 rounded-xl text-sm font-bold text-white flex items-center justify-center gap-2 disabled:opacity-60 transition-all"
-              style={{ background: '#1A3C5E' }}
+              style={{ background: '#111111' }}
             >
               {isSubmitting ? <><Loader2 size={16} className="animate-spin" /> Guardando…</> : (isEdit ? 'Guardar cambios' : 'Crear programa')}
             </button>
