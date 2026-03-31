@@ -1,123 +1,127 @@
 // ─────────────────────────────────────────────────────────────────────────────
-// Rezeta 50 · ReportSummary — encabezado del informe con semáforo global
+// Rezeta 50 · ReportSummary — hero del informe con nivel global + body map
 // ─────────────────────────────────────────────────────────────────────────────
 
 import type { GlobalLevel, ZoneLevel, ZoneResult, RedFlagResult } from '@/types/database'
-import { AlertTriangle, Info } from 'lucide-react'
+import { AlertTriangle } from 'lucide-react'
 
-// ── Configuración visual por nivel global ─────────────────────────────────────
+// ── Config visual por nivel global ────────────────────────────────────────────
 
 const GLOBAL_CONFIG: Record<GlobalLevel, {
-  bg: string
-  ring: string
+  color: string
+  glow: string
+  bgCard: string
+  border: string
   label: string
+  icon: string
   headline: string
   subtext: string
 }> = {
   preventivo: {
-    bg:       '#22c55e',
-    ring:     '#16a34a',
-    label:    'Preventivo',
+    color:   '#22c55e',
+    glow:    'rgba(34,197,94,0.25)',
+    bgCard:  'rgba(34,197,94,0.08)',
+    border:  'rgba(34,197,94,0.3)',
+    label:   'Preventivo',
+    icon:    '✓',
     headline: '¡Tu estado musculoesquelético es muy bueno!',
     subtext:  'No se detectan zonas con afectación relevante. El trabajo preventivo te ayudará a mantenerte así.',
   },
   atencion: {
-    bg:       '#f59e0b',
-    ring:     '#d97706',
-    label:    'Atención',
+    color:   '#f59e0b',
+    glow:    'rgba(245,158,11,0.25)',
+    bgCard:  'rgba(245,158,11,0.08)',
+    border:  'rgba(245,158,11,0.3)',
+    label:   'Atención',
+    icon:    '!',
     headline: 'Hay zonas que merecen atención.',
-    subtext:  'Se han detectado molestias moderadas. Con el programa adecuado puedes mejorar tu situación.',
+    subtext:  'Se detectaron molestias moderadas. Con el programa adecuado puedes mejorar tu situación.',
   },
   rehabilitador: {
-    bg:       '#f97316',
-    ring:     '#ea580c',
-    label:    'Rehabilitador',
+    color:   '#f97316',
+    glow:    'rgba(249,115,22,0.25)',
+    bgCard:  'rgba(249,115,22,0.08)',
+    border:  'rgba(249,115,22,0.3)',
+    label:   'Rehabilitador',
+    icon:    '↑',
     headline: 'Tu cuerpo necesita un programa de recuperación.',
-    subtext:  'Varias zonas muestran afectación significativa. Te recomendamos iniciar un programa de rehabilitación.',
+    subtext:  'Varias zonas muestran afectación significativa. Inicia un programa de rehabilitación.',
   },
   derivacion: {
-    bg:       '#ef4444',
-    ring:     '#dc2626',
-    label:    'Derivación',
-    headline: 'Recomendamos valoración profesional urgente.',
-    subtext:  'Tu valoración indica afectación importante en varias zonas. Consulta con un médico o fisioterapeuta antes de iniciar ejercicio.',
+    color:   '#ef4444',
+    glow:    'rgba(239,68,68,0.25)',
+    bgCard:  'rgba(239,68,68,0.08)',
+    border:  'rgba(239,68,68,0.3)',
+    label:   'Derivación',
+    icon:    '⚠',
+    headline: 'Recomendamos valoración profesional.',
+    subtext:  'Tu valoración indica afectación importante. Consulta con un médico o fisioterapeuta.',
   },
 }
 
-// ── Colors por ZoneLevel para el body map ─────────────────────────────────────
+// ── Colores de zona para el body map ─────────────────────────────────────────
 
-const ZONE_COLORS: Record<ZoneLevel, string> = {
-  verde: '#22c55e',
-  ambar: '#f59e0b',
-  rojo:  '#ef4444',
+const ZONE_COLORS: Record<ZoneLevel, { fill: string; stroke: string; glow: string }> = {
+  verde: { fill: '#22c55e', stroke: '#16a34a', glow: 'rgba(34,197,94,0.6)'  },
+  ambar: { fill: '#f59e0b', stroke: '#d97706', glow: 'rgba(245,158,11,0.6)' },
+  rojo:  { fill: '#ef4444', stroke: '#dc2626', glow: 'rgba(239,68,68,0.6)'  },
 }
-const COLOR_BODY     = '#f1f5f9'
-const COLOR_BODY_STR = '#cbd5e1'
-const COLOR_INACTIVE = '#e2e8f0'
+const INACTIVE_FILL   = '#1e3a5f'
+const INACTIVE_STROKE = '#253f68'
+const BODY_FILL       = '#1a2f50'
+const BODY_STROKE     = '#253f68'
 
-// ── Componente body map estático ──────────────────────────────────────────────
+// ── Helpers body map ─────────────────────────────────────────────────────────
 
-interface ZoneColorMap {
-  zone_code: string
-  side: string | null
-  level: ZoneLevel
+interface ZM { zone_code: string; side: string | null; level: ZoneLevel }
+
+function zFill(zm: ZM[], code: string, side: string | null) {
+  const m = zm.find((z) => z.zone_code === code && z.side === side)
+  return m ? ZONE_COLORS[m.level].fill : INACTIVE_FILL
+}
+function zStroke(zm: ZM[], code: string, side: string | null) {
+  const m = zm.find((z) => z.zone_code === code && z.side === side)
+  return m ? ZONE_COLORS[m.level].stroke : INACTIVE_STROKE
+}
+function zSW(zm: ZM[], code: string, side: string | null) {
+  return zm.find((z) => z.zone_code === code && z.side === side) ? '2' : '0.8'
+}
+function zFilter(zm: ZM[], code: string, side: string | null) {
+  const m = zm.find((z) => z.zone_code === code && z.side === side)
+  return m ? `drop-shadow(0 0 5px ${ZONE_COLORS[m.level].glow})` : undefined
 }
 
-function getZoneColor(
-  zoneMap: ZoneColorMap[],
-  zone_code: string,
-  side: string | null
-): string {
-  const match = zoneMap.find(
-    (z) => z.zone_code === zone_code && z.side === side
-  )
-  return match ? ZONE_COLORS[match.level] : COLOR_INACTIVE
-}
-
-function getZoneStroke(
-  zoneMap: ZoneColorMap[],
-  zone_code: string,
-  side: string | null
-): string {
-  const match = zoneMap.find(
-    (z) => z.zone_code === zone_code && z.side === side
-  )
-  if (!match) return '#cbd5e1'
-  return match.level === 'verde' ? '#16a34a'
-    : match.level === 'ambar' ? '#d97706'
-    : '#dc2626'
-}
+// ── Static Body Map ───────────────────────────────────────────────────────────
 
 function StaticBodyMap({ zoneResults }: { zoneResults: ZoneResult[] }) {
-  const zm: ZoneColorMap[] = zoneResults.map((z) => ({
-    zone_code: z.zone_code,
-    side:      z.side,
-    level:     z.level,
-  }))
-
-  const fill   = (code: string, side: string | null) => getZoneColor(zm, code, side)
-  const stroke = (code: string, side: string | null) => getZoneStroke(zm, code, side)
-  const sw     = (code: string, side: string | null) =>
-    zm.find((z) => z.zone_code === code && z.side === side) ? '1.5' : '0.8'
+  const zm: ZM[] = zoneResults.map((z) => ({ zone_code: z.zone_code, side: z.side, level: z.level }))
+  const f  = (c: string, s: string | null) => zFill(zm, c, s)
+  const st = (c: string, s: string | null) => zStroke(zm, c, s)
+  const sw = (c: string, s: string | null) => zSW(zm, c, s)
+  const fi = (c: string, s: string | null) => zFilter(zm, c, s)
 
   return (
-    <div className="w-full">
-      <div className="flex mb-1 text-xs font-medium text-slate-400 select-none">
-        <div className="flex-1 text-center">FRENTE</div>
-        <div className="flex-1 text-center">ESPALDA</div>
+    <div
+      className="rounded-2xl p-4"
+      style={{ background: '#0b1929' }}
+    >
+      <div className="flex mb-2 text-[10px] font-bold tracking-widest uppercase select-none"
+           style={{ color: 'rgba(255,255,255,0.3)' }}>
+        <div className="flex-1 text-center">Frente</div>
+        <div className="flex-1 text-center">Espalda</div>
       </div>
 
       <svg
         viewBox="0 0 300 420"
         xmlns="http://www.w3.org/2000/svg"
         className="w-full max-w-xs mx-auto"
-        aria-label="Mapa corporal con zonas evaluadas"
+        aria-label="Mapa corporal con resultados"
       >
         {/* Divisor */}
-        <line x1="150" y1="0" x2="150" y2="420" stroke="#e2e8f0" strokeWidth="1" />
+        <line x1="150" y1="0" x2="150" y2="420" stroke="rgba(255,255,255,0.06)" strokeWidth="1" />
 
-        {/* ─── SILUETA FRENTE ─────────────────────────────────── */}
-        <g fill={COLOR_BODY} stroke={COLOR_BODY_STR} strokeWidth="1.2">
+        {/* ─── SILUETA FRENTE ─── */}
+        <g fill={BODY_FILL} stroke={BODY_STROKE} strokeWidth="1">
           <ellipse cx="75" cy="36" rx="18" ry="21" />
           <rect x="68" y="54" width="14" height="14" rx="2" />
           <path d="M50,66 C40,70 36,82 35,96 L34,185 C34,198 52,208 75,210 C98,208 116,198 116,185 L115,96 C114,82 110,70 100,66 Z" />
@@ -127,35 +131,23 @@ function StaticBodyMap({ zoneResults }: { zoneResults: ZoneResult[] }) {
           <path d="M72,210 L68,212 L66,295 L64,365 L66,392 L75,396 L73,396 L71,392 L70,365 L72,295 L74,212 Z" />
         </g>
 
-        {/* HOMBRO D (paciente) */}
-        <ellipse cx="37" cy="76" rx="15" ry="10" fill={fill('shoulder','r')} stroke={stroke('shoulder','r')} strokeWidth={sw('shoulder','r')} opacity="0.9" />
-        {/* HOMBRO I */}
-        <ellipse cx="113" cy="76" rx="15" ry="10" fill={fill('shoulder','l')} stroke={stroke('shoulder','l')} strokeWidth={sw('shoulder','l')} opacity="0.9" />
-        {/* CODO D */}
-        <ellipse cx="30" cy="133" rx="11" ry="13" fill={fill('elbow','r')} stroke={stroke('elbow','r')} strokeWidth={sw('elbow','r')} opacity="0.9" />
-        {/* CODO I */}
-        <ellipse cx="120" cy="133" rx="11" ry="13" fill={fill('elbow','l')} stroke={stroke('elbow','l')} strokeWidth={sw('elbow','l')} opacity="0.9" />
-        {/* MUÑECA D */}
-        <ellipse cx="30" cy="172" rx="10" ry="12" fill={fill('wrist','r')} stroke={stroke('wrist','r')} strokeWidth={sw('wrist','r')} opacity="0.9" />
-        {/* MUÑECA I */}
-        <ellipse cx="120" cy="172" rx="10" ry="12" fill={fill('wrist','l')} stroke={stroke('wrist','l')} strokeWidth={sw('wrist','l')} opacity="0.9" />
-        {/* CADERA D */}
-        <ellipse cx="58" cy="218" rx="14" ry="11" fill={fill('hip','r')} stroke={stroke('hip','r')} strokeWidth={sw('hip','r')} opacity="0.9" />
-        {/* CADERA I */}
-        <ellipse cx="92" cy="218" rx="14" ry="11" fill={fill('hip','l')} stroke={stroke('hip','l')} strokeWidth={sw('hip','l')} opacity="0.9" />
-        {/* RODILLA D */}
-        <ellipse cx="60" cy="295" rx="13" ry="16" fill={fill('knee','r')} stroke={stroke('knee','r')} strokeWidth={sw('knee','r')} opacity="0.9" />
-        {/* RODILLA I */}
-        <ellipse cx="90" cy="295" rx="13" ry="16" fill={fill('knee','l')} stroke={stroke('knee','l')} strokeWidth={sw('knee','l')} opacity="0.9" />
-        {/* TOBILLO D */}
-        <ellipse cx="60" cy="371" rx="12" ry="17" fill={fill('ankle_foot','r')} stroke={stroke('ankle_foot','r')} strokeWidth={sw('ankle_foot','r')} opacity="0.9" />
-        {/* TOBILLO I */}
-        <ellipse cx="90" cy="371" rx="12" ry="17" fill={fill('ankle_foot','l')} stroke={stroke('ankle_foot','l')} strokeWidth={sw('ankle_foot','l')} opacity="0.9" />
+        {/* Zonas frente */}
+        <ellipse cx="37" cy="76" rx="15" ry="10" fill={f('shoulder','r')} stroke={st('shoulder','r')} strokeWidth={sw('shoulder','r')} style={{ filter: fi('shoulder','r') }} opacity="0.95" />
+        <ellipse cx="113" cy="76" rx="15" ry="10" fill={f('shoulder','l')} stroke={st('shoulder','l')} strokeWidth={sw('shoulder','l')} style={{ filter: fi('shoulder','l') }} opacity="0.95" />
+        <ellipse cx="30" cy="133" rx="11" ry="13" fill={f('elbow','r')} stroke={st('elbow','r')} strokeWidth={sw('elbow','r')} style={{ filter: fi('elbow','r') }} opacity="0.95" />
+        <ellipse cx="120" cy="133" rx="11" ry="13" fill={f('elbow','l')} stroke={st('elbow','l')} strokeWidth={sw('elbow','l')} style={{ filter: fi('elbow','l') }} opacity="0.95" />
+        <ellipse cx="30" cy="172" rx="10" ry="12" fill={f('wrist','r')} stroke={st('wrist','r')} strokeWidth={sw('wrist','r')} style={{ filter: fi('wrist','r') }} opacity="0.95" />
+        <ellipse cx="120" cy="172" rx="10" ry="12" fill={f('wrist','l')} stroke={st('wrist','l')} strokeWidth={sw('wrist','l')} style={{ filter: fi('wrist','l') }} opacity="0.95" />
+        <ellipse cx="58" cy="218" rx="14" ry="11" fill={f('hip','r')} stroke={st('hip','r')} strokeWidth={sw('hip','r')} style={{ filter: fi('hip','r') }} opacity="0.95" />
+        <ellipse cx="92" cy="218" rx="14" ry="11" fill={f('hip','l')} stroke={st('hip','l')} strokeWidth={sw('hip','l')} style={{ filter: fi('hip','l') }} opacity="0.95" />
+        <ellipse cx="60" cy="295" rx="13" ry="16" fill={f('knee','r')} stroke={st('knee','r')} strokeWidth={sw('knee','r')} style={{ filter: fi('knee','r') }} opacity="0.95" />
+        <ellipse cx="90" cy="295" rx="13" ry="16" fill={f('knee','l')} stroke={st('knee','l')} strokeWidth={sw('knee','l')} style={{ filter: fi('knee','l') }} opacity="0.95" />
+        <ellipse cx="60" cy="371" rx="12" ry="17" fill={f('ankle_foot','r')} stroke={st('ankle_foot','r')} strokeWidth={sw('ankle_foot','r')} style={{ filter: fi('ankle_foot','r') }} opacity="0.95" />
+        <ellipse cx="90" cy="371" rx="12" ry="17" fill={f('ankle_foot','l')} stroke={st('ankle_foot','l')} strokeWidth={sw('ankle_foot','l')} style={{ filter: fi('ankle_foot','l') }} opacity="0.95" />
+        <text x="75" y="412" textAnchor="middle" fontSize="7" fill="rgba(255,255,255,0.2)">← D &nbsp; I →</text>
 
-        <text x="75" y="412" textAnchor="middle" fontSize="7" fill="#94a3b8">← D  &nbsp;&nbsp; I →</text>
-
-        {/* ─── SILUETA ESPALDA ─────────────────────────────────── */}
-        <g fill={COLOR_BODY} stroke={COLOR_BODY_STR} strokeWidth="1.2">
+        {/* ─── SILUETA ESPALDA ─── */}
+        <g fill={BODY_FILL} stroke={BODY_STROKE} strokeWidth="1">
           <ellipse cx="225" cy="36" rx="18" ry="21" />
           <rect x="218" y="54" width="14" height="14" rx="2" />
           <path d="M200,66 C190,70 186,82 185,96 L184,185 C184,198 202,208 225,210 C248,208 266,198 266,185 L265,96 C264,82 260,70 250,66 Z" />
@@ -165,54 +157,42 @@ function StaticBodyMap({ zoneResults }: { zoneResults: ZoneResult[] }) {
           <path d="M222,210 L218,212 L216,295 L214,365 L216,392 L225,396 L223,396 L221,392 L220,365 L222,295 L224,212 Z" />
         </g>
 
-        {/* CERVICAL */}
-        <ellipse cx="225" cy="63" rx="13" ry="10" fill={fill('cervical',null)} stroke={stroke('cervical',null)} strokeWidth={sw('cervical',null)} opacity="0.9" />
-        {/* DORSAL */}
-        <rect x="208" y="82" width="34" height="50" rx="5" fill={fill('dorsal',null)} stroke={stroke('dorsal',null)} strokeWidth={sw('dorsal',null)} opacity="0.9" />
-        {/* LUMBAR */}
-        <rect x="210" y="138" width="30" height="40" rx="5" fill={fill('lumbar',null)} stroke={stroke('lumbar',null)} strokeWidth={sw('lumbar',null)} opacity="0.9" />
-        {/* HOMBRO D espalda */}
-        <ellipse cx="187" cy="76" rx="15" ry="10" fill={fill('shoulder','r')} stroke={stroke('shoulder','r')} strokeWidth={sw('shoulder','r')} opacity="0.9" />
-        {/* HOMBRO I espalda */}
-        <ellipse cx="263" cy="76" rx="15" ry="10" fill={fill('shoulder','l')} stroke={stroke('shoulder','l')} strokeWidth={sw('shoulder','l')} opacity="0.9" />
-        {/* CODO D espalda */}
-        <ellipse cx="180" cy="133" rx="11" ry="13" fill={fill('elbow','r')} stroke={stroke('elbow','r')} strokeWidth={sw('elbow','r')} opacity="0.9" />
-        {/* CODO I espalda */}
-        <ellipse cx="270" cy="133" rx="11" ry="13" fill={fill('elbow','l')} stroke={stroke('elbow','l')} strokeWidth={sw('elbow','l')} opacity="0.9" />
-        {/* MUÑECA D espalda */}
-        <ellipse cx="180" cy="172" rx="10" ry="12" fill={fill('wrist','r')} stroke={stroke('wrist','r')} strokeWidth={sw('wrist','r')} opacity="0.9" />
-        {/* MUÑECA I espalda */}
-        <ellipse cx="270" cy="172" rx="10" ry="12" fill={fill('wrist','l')} stroke={stroke('wrist','l')} strokeWidth={sw('wrist','l')} opacity="0.9" />
-        {/* CADERA D espalda */}
-        <ellipse cx="208" cy="218" rx="14" ry="11" fill={fill('hip','r')} stroke={stroke('hip','r')} strokeWidth={sw('hip','r')} opacity="0.9" />
-        {/* CADERA I espalda */}
-        <ellipse cx="242" cy="218" rx="14" ry="11" fill={fill('hip','l')} stroke={stroke('hip','l')} strokeWidth={sw('hip','l')} opacity="0.9" />
-        {/* RODILLA D espalda */}
-        <ellipse cx="210" cy="295" rx="13" ry="16" fill={fill('knee','r')} stroke={stroke('knee','r')} strokeWidth={sw('knee','r')} opacity="0.9" />
-        {/* RODILLA I espalda */}
-        <ellipse cx="240" cy="295" rx="13" ry="16" fill={fill('knee','l')} stroke={stroke('knee','l')} strokeWidth={sw('knee','l')} opacity="0.9" />
-        {/* TOBILLO D espalda */}
-        <ellipse cx="210" cy="371" rx="12" ry="17" fill={fill('ankle_foot','r')} stroke={stroke('ankle_foot','r')} strokeWidth={sw('ankle_foot','r')} opacity="0.9" />
-        {/* TOBILLO I espalda */}
-        <ellipse cx="240" cy="371" rx="12" ry="17" fill={fill('ankle_foot','l')} stroke={stroke('ankle_foot','l')} strokeWidth={sw('ankle_foot','l')} opacity="0.9" />
-
-        <text x="225" y="412" textAnchor="middle" fontSize="7" fill="#94a3b8">← D  &nbsp;&nbsp; I →</text>
+        {/* Zonas espalda */}
+        <ellipse cx="225" cy="63" rx="13" ry="10" fill={f('cervical',null)} stroke={st('cervical',null)} strokeWidth={sw('cervical',null)} style={{ filter: fi('cervical',null) }} opacity="0.95" />
+        <rect x="208" y="82" width="34" height="50" rx="5" fill={f('dorsal',null)} stroke={st('dorsal',null)} strokeWidth={sw('dorsal',null)} style={{ filter: fi('dorsal',null) }} opacity="0.95" />
+        <rect x="210" y="138" width="30" height="40" rx="5" fill={f('lumbar',null)} stroke={st('lumbar',null)} strokeWidth={sw('lumbar',null)} style={{ filter: fi('lumbar',null) }} opacity="0.95" />
+        <ellipse cx="187" cy="76" rx="15" ry="10" fill={f('shoulder','r')} stroke={st('shoulder','r')} strokeWidth={sw('shoulder','r')} style={{ filter: fi('shoulder','r') }} opacity="0.95" />
+        <ellipse cx="263" cy="76" rx="15" ry="10" fill={f('shoulder','l')} stroke={st('shoulder','l')} strokeWidth={sw('shoulder','l')} style={{ filter: fi('shoulder','l') }} opacity="0.95" />
+        <ellipse cx="180" cy="133" rx="11" ry="13" fill={f('elbow','r')} stroke={st('elbow','r')} strokeWidth={sw('elbow','r')} style={{ filter: fi('elbow','r') }} opacity="0.95" />
+        <ellipse cx="270" cy="133" rx="11" ry="13" fill={f('elbow','l')} stroke={st('elbow','l')} strokeWidth={sw('elbow','l')} style={{ filter: fi('elbow','l') }} opacity="0.95" />
+        <ellipse cx="180" cy="172" rx="10" ry="12" fill={f('wrist','r')} stroke={st('wrist','r')} strokeWidth={sw('wrist','r')} style={{ filter: fi('wrist','r') }} opacity="0.95" />
+        <ellipse cx="270" cy="172" rx="10" ry="12" fill={f('wrist','l')} stroke={st('wrist','l')} strokeWidth={sw('wrist','l')} style={{ filter: fi('wrist','l') }} opacity="0.95" />
+        <ellipse cx="208" cy="218" rx="14" ry="11" fill={f('hip','r')} stroke={st('hip','r')} strokeWidth={sw('hip','r')} style={{ filter: fi('hip','r') }} opacity="0.95" />
+        <ellipse cx="242" cy="218" rx="14" ry="11" fill={f('hip','l')} stroke={st('hip','l')} strokeWidth={sw('hip','l')} style={{ filter: fi('hip','l') }} opacity="0.95" />
+        <ellipse cx="210" cy="295" rx="13" ry="16" fill={f('knee','r')} stroke={st('knee','r')} strokeWidth={sw('knee','r')} style={{ filter: fi('knee','r') }} opacity="0.95" />
+        <ellipse cx="240" cy="295" rx="13" ry="16" fill={f('knee','l')} stroke={st('knee','l')} strokeWidth={sw('knee','l')} style={{ filter: fi('knee','l') }} opacity="0.95" />
+        <ellipse cx="210" cy="371" rx="12" ry="17" fill={f('ankle_foot','r')} stroke={st('ankle_foot','r')} strokeWidth={sw('ankle_foot','r')} style={{ filter: fi('ankle_foot','r') }} opacity="0.95" />
+        <ellipse cx="240" cy="371" rx="12" ry="17" fill={f('ankle_foot','l')} stroke={st('ankle_foot','l')} strokeWidth={sw('ankle_foot','l')} style={{ filter: fi('ankle_foot','l') }} opacity="0.95" />
+        <text x="225" y="412" textAnchor="middle" fontSize="7" fill="rgba(255,255,255,0.2)">← D &nbsp; I →</text>
       </svg>
 
       {/* Leyenda */}
-      <div className="flex items-center justify-center gap-3 mt-2 text-xs text-slate-500 select-none flex-wrap">
-        <span className="flex items-center gap-1">
-          <span className="inline-block w-3 h-3 rounded-full bg-green-500" /> Verde
-        </span>
-        <span className="flex items-center gap-1">
-          <span className="inline-block w-3 h-3 rounded-full bg-amber-400" /> Ámbar
-        </span>
-        <span className="flex items-center gap-1">
-          <span className="inline-block w-3 h-3 rounded-full bg-red-500" /> Rojo
-        </span>
-        <span className="flex items-center gap-1">
-          <span className="inline-block w-3 h-3 rounded-full bg-slate-200" /> No evaluada
-        </span>
+      <div className="flex items-center justify-center gap-4 mt-3 text-[10px] font-medium select-none flex-wrap"
+           style={{ color: 'rgba(255,255,255,0.45)' }}>
+        {[
+          { color: '#22c55e', glow: 'rgba(34,197,94,0.5)',  label: 'Verde'     },
+          { color: '#f59e0b', glow: 'rgba(245,158,11,0.5)', label: 'Ámbar'     },
+          { color: '#ef4444', glow: 'rgba(239,68,68,0.5)',  label: 'Rojo'      },
+          { color: '#1e3a5f', glow: 'none',                 label: 'No evaluada' },
+        ].map(({ color, glow, label }) => (
+          <span key={label} className="flex items-center gap-1.5">
+            <span
+              className="inline-block w-2.5 h-2.5 rounded-full"
+              style={{ background: color, boxShadow: glow !== 'none' ? `0 0 6px ${glow}` : undefined }}
+            />
+            {label}
+          </span>
+        ))}
       </div>
     </div>
   )
@@ -236,42 +216,68 @@ export default function ReportSummary({
   const cfg = GLOBAL_CONFIG[globalLevel]
 
   return (
-    <div className="space-y-5">
-      {/* Score global + titular */}
-      <div className="flex items-center gap-5">
-        {/* Círculo de score */}
-        <div
-          className="w-20 h-20 rounded-full flex flex-col items-center justify-center flex-shrink-0 text-white shadow-md"
-          style={{ background: cfg.bg, boxShadow: `0 0 0 4px ${cfg.ring}30` }}
-        >
-          <span className="text-2xl font-black leading-none">{globalScore}</span>
-          <span className="text-xs font-semibold opacity-90">/100</span>
+    <div className="space-y-4">
+      {/* ── Hero: nivel global ──────────────────────────────────── */}
+      <div
+        className="rounded-2xl p-6 text-center space-y-4"
+        style={{
+          background: cfg.bgCard,
+          border: `1px solid ${cfg.border}`,
+          boxShadow: `0 0 40px ${cfg.glow}`,
+        }}
+      >
+        {/* Score circular */}
+        <div className="flex justify-center">
+          <div
+            className="w-24 h-24 rounded-full flex flex-col items-center justify-center"
+            style={{
+              background: `radial-gradient(circle, ${cfg.color}22 0%, ${cfg.color}08 100%)`,
+              border: `3px solid ${cfg.color}`,
+              boxShadow: `0 0 30px ${cfg.glow}, inset 0 0 20px ${cfg.color}10`,
+            }}
+          >
+            <span className="text-3xl font-black leading-none" style={{ color: cfg.color }}>
+              {globalScore}
+            </span>
+            <span className="text-[10px] font-semibold" style={{ color: `${cfg.color}99` }}>
+              /100
+            </span>
+          </div>
         </div>
 
-        <div className="flex-1 min-w-0">
-          <div
-            className="inline-block text-xs font-bold px-2 py-0.5 rounded-full text-white mb-1"
-            style={{ background: cfg.bg }}
+        {/* Badge nivel */}
+        <div>
+          <span
+            className="inline-block text-xs font-bold px-3 py-1 rounded-full mb-2"
+            style={{ background: cfg.color, color: '#111111' }}
           >
             {cfg.label}
-          </div>
-          <h2 className="text-base font-bold text-[#111111] leading-snug">{cfg.headline}</h2>
-          <p className="text-xs text-slate-500 mt-0.5">{cfg.subtext}</p>
+          </span>
+          <h2 className="text-lg font-black text-white leading-snug">{cfg.headline}</h2>
+          <p className="text-xs mt-1.5" style={{ color: 'rgba(255,255,255,0.55)' }}>
+            {cfg.subtext}
+          </p>
         </div>
       </div>
 
-      {/* Red flags */}
+      {/* ── Red flags ──────────────────────────────────────────── */}
       {redFlags.length > 0 && (
-        <div className="rounded-2xl border border-red-200 bg-red-50 p-4 space-y-2">
-          <div className="flex items-center gap-2 text-red-700 font-bold text-sm">
-            <AlertTriangle size={16} />
+        <div
+          className="rounded-2xl p-4 space-y-2"
+          style={{ background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.3)' }}
+        >
+          <div className="flex items-center gap-2 font-bold text-sm text-red-400">
+            <AlertTriangle size={15} />
             Avisos importantes
           </div>
           <ul className="space-y-1.5">
             {redFlags.map((flag, i) => (
-              <li key={i} className="flex items-start gap-2 text-xs text-red-700">
-                <span className="mt-0.5 flex-shrink-0 w-5 h-5 rounded-full bg-red-100 flex items-center justify-center text-[10px] font-bold">
-                  {flag.id.replace('RF-', '!')}
+              <li key={i} className="flex items-start gap-2 text-xs text-red-300">
+                <span
+                  className="mt-0.5 flex-shrink-0 w-4 h-4 rounded-full flex items-center justify-center text-[9px] font-black"
+                  style={{ background: 'rgba(239,68,68,0.3)', color: '#fca5a5' }}
+                >
+                  !
                 </span>
                 <span>{flag.message}</span>
               </li>
@@ -280,17 +286,7 @@ export default function ReportSummary({
         </div>
       )}
 
-      {/* Info si no hay red flags pero nivel alto */}
-      {redFlags.length === 0 && (globalLevel === 'rehabilitador' || globalLevel === 'derivacion') && (
-        <div className="rounded-2xl border border-amber-200 bg-amber-50 p-3 flex items-start gap-2">
-          <Info size={14} className="text-amber-600 mt-0.5 flex-shrink-0" />
-          <p className="text-xs text-amber-700">
-            Tu valoración indica un nivel de afectación significativo. Consulta con un profesional antes de iniciar cualquier programa.
-          </p>
-        </div>
-      )}
-
-      {/* Body map */}
+      {/* ── Body map ───────────────────────────────────────────── */}
       <StaticBodyMap zoneResults={zoneResults} />
     </div>
   )

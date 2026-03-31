@@ -1,60 +1,57 @@
 // ─────────────────────────────────────────────────────────────────────────────
-// Rezeta 50 · ProgramCard — tarjeta de programa Harbiz recomendado
+// Rezeta 50 · ProgramCard — tarjeta de programa recomendado (dark theme)
 // ─────────────────────────────────────────────────────────────────────────────
 
 import type { ProgramSnapshot } from '@/types/database'
-import { ExternalLink, Clock, BarChart2, Euro } from 'lucide-react'
+import { ExternalLink, Clock, BarChart2 } from 'lucide-react'
 
-// ── Etiquetas de fase ─────────────────────────────────────────────────────────
-
-const PHASE_LABELS: Record<string, string> = {
-  prehab:       'Prevención',
-  rehab_fase1:  'Rehabilitación Fase 1',
-  rehab_fase2:  'Rehabilitación Fase 2',
+const PHASE_CONFIG: Record<string, { label: string; color: string; bg: string }> = {
+  prehab:      { label: 'Prevención',          color: '#22c55e', bg: 'rgba(34,197,94,0.12)'  },
+  rehab_fase1: { label: 'Rehabilitación F1',   color: '#f59e0b', bg: 'rgba(245,158,11,0.12)' },
+  rehab_fase2: { label: 'Rehabilitación F2',   color: '#ef4444', bg: 'rgba(239,68,68,0.12)'  },
 }
 
-const PHASE_COLORS: Record<string, string> = {
-  prehab:       'bg-green-100 text-green-700',
-  rehab_fase1:  'bg-amber-100 text-amber-700',
-  rehab_fase2:  'bg-red-100 text-red-700',
-}
-
-interface ProgramCardProps {
-  program: ProgramSnapshot
-}
-
-export default function ProgramCard({ program }: ProgramCardProps) {
-  const phaseLabel = PHASE_LABELS[program.phase] ?? program.phase
-  const phaseColor = PHASE_COLORS[program.phase] ?? 'bg-slate-100 text-slate-600'
+export default function ProgramCard({ program }: { program: ProgramSnapshot }) {
+  const phase = PHASE_CONFIG[program.phase] ?? { label: program.phase, color: '#94a3b8', bg: 'rgba(148,163,184,0.12)' }
 
   return (
-    <div className="rounded-2xl border border-slate-200 bg-white p-4 space-y-3 hover:border-[#F4DF49]/60 hover:shadow-sm transition-all">
+    <div
+      className="rounded-2xl p-4 space-y-4"
+      style={{
+        background: 'rgba(255,255,255,0.04)',
+        border: '1px solid rgba(255,255,255,0.1)',
+      }}
+    >
       {/* Cabecera */}
-      <div className="flex items-start justify-between gap-2">
+      <div className="flex items-start justify-between gap-3">
         <div className="flex-1 min-w-0">
-          <h3 className="font-bold text-[#111111] text-sm leading-snug">{program.name}</h3>
+          <h3 className="font-bold text-white text-sm leading-snug">{program.name}</h3>
           {program.description && (
-            <p className="text-xs text-slate-500 mt-0.5 line-clamp-2">{program.description}</p>
+            <p className="text-xs mt-1 line-clamp-2" style={{ color: 'rgba(255,255,255,0.5)' }}>
+              {program.description}
+            </p>
           )}
         </div>
-        <span className={`text-[11px] font-semibold px-2 py-0.5 rounded-full flex-shrink-0 ${phaseColor}`}>
-          {phaseLabel}
+        <span
+          className="text-[11px] font-bold px-2.5 py-0.5 rounded-full flex-shrink-0 whitespace-nowrap"
+          style={{ background: phase.bg, color: phase.color }}
+        >
+          {phase.label}
         </span>
       </div>
 
-      {/* Datos del programa */}
-      <div className="flex flex-wrap gap-3">
-        <span className="flex items-center gap-1 text-xs text-slate-500">
-          <Clock size={12} className="text-[#111111]" />
-          {program.duration_weeks} semanas · {program.sessions_week}x/semana
+      {/* Métricas */}
+      <div className="flex flex-wrap gap-4">
+        <span className="flex items-center gap-1.5 text-xs" style={{ color: 'rgba(255,255,255,0.5)' }}>
+          <Clock size={12} style={{ color: '#F4DF49' }} />
+          {program.duration_weeks} sem · {program.sessions_week}x/sem
         </span>
-        <span className="flex items-center gap-1 text-xs text-slate-500">
-          <Euro size={12} className="text-[#111111]" />
+        <span className="flex items-center gap-1.5 text-xs" style={{ color: 'rgba(255,255,255,0.5)' }}>
+          <BarChart2 size={12} style={{ color: '#F4DF49' }} />
+          {Math.min(program.match_score, 100)}% compatible
+        </span>
+        <span className="text-xs font-bold" style={{ color: '#F4DF49' }}>
           {program.price_eur === 0 ? 'Gratis' : `${program.price_eur} €`}
-        </span>
-        <span className="flex items-center gap-1 text-xs text-slate-500">
-          <BarChart2 size={12} className="text-[#111111]" />
-          Compatibilidad: {Math.min(program.match_score, 100)}%
         </span>
       </div>
 
@@ -63,12 +60,10 @@ export default function ProgramCard({ program }: ProgramCardProps) {
         href={program.harbiz_url}
         target="_blank"
         rel="noopener noreferrer"
-        className="flex items-center justify-center gap-2 w-full py-2.5 px-4 rounded-xl text-sm font-bold text-white transition-all"
-        style={{ background: '#22c55e' }}
-        onMouseOver={(e) => { (e.currentTarget as HTMLElement).style.background = '#16a34a' }}
-        onMouseOut={(e) => { (e.currentTarget as HTMLElement).style.background = '#22c55e' }}
+        className="flex items-center justify-center gap-2 w-full py-3 px-4 rounded-xl text-sm font-bold transition-all active:scale-95"
+        style={{ background: '#F4DF49', color: '#111111' }}
       >
-        Ver programa
+        Ver programa completo
         <ExternalLink size={14} />
       </a>
     </div>

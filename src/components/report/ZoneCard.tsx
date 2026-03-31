@@ -1,10 +1,8 @@
 // ─────────────────────────────────────────────────────────────────────────────
-// Rezeta 50 · ZoneCard — tarjeta de resultado por zona
+// Rezeta 50 · ZoneCard — tarjeta de resultado por zona (dark theme)
 // ─────────────────────────────────────────────────────────────────────────────
 
 import type { ZoneResult } from '@/types/database'
-
-// ── Etiquetas de zona ─────────────────────────────────────────────────────────
 
 const ZONE_LABELS: Record<string, string> = {
   cervical:   'Cervical',
@@ -18,80 +16,91 @@ const ZONE_LABELS: Record<string, string> = {
   ankle_foot: 'Tobillo / Pie',
 }
 
-// ── Configuración visual por nivel ───────────────────────────────────────────
-
 const LEVEL_CONFIG = {
   verde: {
-    emoji: '🟢',
-    bar:   '#22c55e',
-    bg:    'bg-green-50',
-    border:'border-green-200',
-    badge: 'bg-green-100 text-green-700',
-    label: 'Verde',
+    color:  '#22c55e',
+    glow:   'rgba(34,197,94,0.2)',
+    border: 'rgba(34,197,94,0.25)',
+    label:  'Verde',
+    bar:    '#22c55e',
+    barBg:  'rgba(34,197,94,0.12)',
   },
   ambar: {
-    emoji: '🟡',
-    bar:   '#f59e0b',
-    bg:    'bg-amber-50',
-    border:'border-amber-200',
-    badge: 'bg-amber-100 text-amber-700',
-    label: 'Ámbar',
+    color:  '#f59e0b',
+    glow:   'rgba(245,158,11,0.2)',
+    border: 'rgba(245,158,11,0.25)',
+    label:  'Ámbar',
+    bar:    '#f59e0b',
+    barBg:  'rgba(245,158,11,0.12)',
   },
   rojo: {
-    emoji: '🔴',
-    bar:   '#ef4444',
-    bg:    'bg-red-50',
-    border:'border-red-200',
-    badge: 'bg-red-100 text-red-700',
-    label: 'Rojo',
+    color:  '#ef4444',
+    glow:   'rgba(239,68,68,0.2)',
+    border: 'rgba(239,68,68,0.25)',
+    label:  'Rojo',
+    bar:    '#ef4444',
+    barBg:  'rgba(239,68,68,0.12)',
   },
 } as const
 
-interface ZoneCardProps {
-  result: ZoneResult
-}
-
-export default function ZoneCard({ result }: ZoneCardProps) {
-  const cfg       = LEVEL_CONFIG[result.level]
-  const zoneName  = ZONE_LABELS[result.zone_code] ?? result.zone_code
-  const sideLabel = !result.side ? '' : result.side === 'r' ? ' derecho' : ' izquierdo'
-  const fullName  = `${zoneName}${sideLabel}`
+export default function ZoneCard({ result }: { result: ZoneResult }) {
+  const cfg      = LEVEL_CONFIG[result.level]
+  const zoneName = ZONE_LABELS[result.zone_code] ?? result.zone_code
+  const side     = !result.side ? '' : result.side === 'r' ? ' derecho' : ' izquierdo'
 
   return (
-    <div className={`rounded-2xl border p-4 space-y-3 ${cfg.bg} ${cfg.border}`}>
+    <div
+      className="rounded-2xl p-4 space-y-3"
+      style={{
+        background: 'rgba(255,255,255,0.03)',
+        border: `1px solid ${cfg.border}`,
+        boxShadow: `0 0 20px ${cfg.glow}`,
+      }}
+    >
       {/* Cabecera */}
       <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <span className="text-lg" role="img" aria-label={cfg.label}>{cfg.emoji}</span>
-          <span className="font-bold text-[#111111] text-sm">{fullName}</span>
-        </div>
-        <span className={`text-xs font-semibold px-2 py-0.5 rounded-full ${cfg.badge}`}>
+        <span className="font-bold text-white text-sm">
+          {zoneName}{side}
+        </span>
+        <span
+          className="text-[11px] font-bold px-2.5 py-0.5 rounded-full"
+          style={{ background: cfg.glow, color: cfg.color, border: `1px solid ${cfg.border}` }}
+        >
           {cfg.label}
         </span>
       </div>
 
-      {/* Barra de progreso */}
+      {/* Barra de score */}
       <div>
-        <div className="flex justify-between items-center mb-1">
-          <span className="text-xs text-slate-500">Nivel de afectación</span>
-          <span className="text-sm font-black text-[#111111]">{result.score}<span className="text-xs font-normal text-slate-400">/100</span></span>
+        <div className="flex justify-between items-center mb-1.5">
+          <span className="text-[11px]" style={{ color: 'rgba(255,255,255,0.4)' }}>Afectación</span>
+          <span className="text-sm font-black" style={{ color: cfg.color }}>
+            {result.score}<span className="text-xs font-normal" style={{ color: 'rgba(255,255,255,0.3)' }}>/100</span>
+          </span>
         </div>
-        <div className="w-full h-2.5 bg-white rounded-full border border-slate-200 overflow-hidden">
+        <div
+          className="w-full h-2 rounded-full overflow-hidden"
+          style={{ background: cfg.barBg }}
+        >
           <div
             className="h-full rounded-full transition-all"
-            style={{ width: `${result.score}%`, background: cfg.bar }}
+            style={{
+              width: `${result.score}%`,
+              background: cfg.bar,
+              boxShadow: `0 0 8px ${cfg.glow}`,
+            }}
           />
         </div>
       </div>
 
       {/* Orientación */}
-      <p className="text-xs text-slate-600 leading-relaxed">
+      <p className="text-xs leading-relaxed" style={{ color: 'rgba(255,255,255,0.6)' }}>
         {result.orientation}
       </p>
 
       {/* Patología candidata */}
       {result.candidate_pathology && result.candidate_pathology !== '—' && (
-        <p className="text-[11px] text-slate-400 italic">
+        <p className="text-[11px] italic" style={{ color: 'rgba(255,255,255,0.3)' }}>
           Posible: {result.candidate_pathology}
         </p>
       )}
