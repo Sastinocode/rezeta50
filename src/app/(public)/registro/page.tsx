@@ -86,16 +86,19 @@ export default function RegistroPage() {
   const [loading, setLoading] = useState(false)
   const [loadingPhase, setLoadingPhase] = useState<'auth' | 'saving' | 'report'>('auth')
   const [serverError, setServerError] = useState('')
+  const [emailPending, setEmailPending] = useState('')
 
   // ── Formulario Registro ──────────────────────────────────────────────────
 
   const registerForm = useForm<RegisterData>({
     resolver: zodResolver(registerSchema),
+    mode: 'onChange',
     defaultValues: { email: '', password: '', rgpd: undefined as unknown as true },
   })
 
   const loginForm = useForm<LoginData>({
     resolver: zodResolver(loginSchema),
+    mode: 'onChange',
     defaultValues: { email: '', password: '' },
   })
 
@@ -105,6 +108,7 @@ export default function RegistroPage() {
     setLoading(true)
     setLoadingPhase('auth')
     setServerError('')
+    setEmailPending('')
     try {
       const { data: authData, error } = await supabase.auth.signUp({
         email: data.email,
@@ -112,6 +116,12 @@ export default function RegistroPage() {
       })
       if (error) throw error
       if (!authData.user) throw new Error('No se pudo crear la cuenta')
+
+      // Sin sesión → Supabase tiene confirmación de email activada
+      if (!authData.session) {
+        setEmailPending(data.email)
+        return
+      }
 
       // Guardar cuestionario y generar informe
       setLoadingPhase('saving')
@@ -188,7 +198,20 @@ export default function RegistroPage() {
             </p>
           </div>
 
+          {/* Email pendiente de confirmación */}
+          {emailPending && (
+            <div className="mb-4 p-4 rounded-2xl bg-amber-50 border border-amber-200 text-center space-y-2">
+              <div className="text-2xl">📬</div>
+              <p className="text-sm font-bold text-amber-800">Confirma tu email</p>
+              <p className="text-xs text-amber-700">
+                Hemos enviado un enlace de confirmación a <strong>{emailPending}</strong>.
+                Ábrelo y vuelve aquí para acceder a tu informe.
+              </p>
+            </div>
+          )}
+
           {/* Card */}
+          {!emailPending && (
           <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
 
             {/* Tabs */}
@@ -318,11 +341,14 @@ export default function RegistroPage() {
               )}
             </div>
           </div>
+          )}
 
-          {/* Nota sobre email confirmation */}
-          <p className="text-center text-xs text-slate-400 mt-4 px-2">
-            Sin spam. Sin confirmación de email. Acceso inmediato.
-          </p>
+          {/* Nota */}
+          {!emailPending && (
+            <p className="text-center text-xs text-slate-400 mt-4 px-2">
+              Sin spam. Sin confirmación de email. Acceso inmediato.
+            </p>
+          )}
         </div>
       </main>
     </div>
