@@ -1,0 +1,11 @@
+User-agent: *
+Allow: /
+Allow: /cuestionario
+
+# Rutas privadas — no indexar
+Disallow: /informe/
+Disallow: /perfil/
+Disallow: /admin/
+Disallow: /api/
+
+Sitemap: https://rezeta50.vercel.app/sitemap.xml

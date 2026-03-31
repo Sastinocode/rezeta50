@@ -1,0 +1,268 @@
+// Prisma Schema for REZETA 50 / FUSIONETICS Sports Performance & Rehabilitation MVP
+// Provider: PostgreSQL
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ─────────────────────────────────────────────
+// Enums
+// ─────────────────────────────────────────────
+
+enum UserRole {
+  ATHLETE
+  COACH
+  ADMIN
+}
+
+enum DominantSide {
+  LEFT
+  RIGHT
+  BILATERAL
+}
+
+enum EvaluationType {
+  MHQ
+  AHQ
+}
+
+enum BodySide {
+  LEFT
+  RIGHT
+  BILATERAL
+}
+
+enum PainType {
+  SHARP
+  DULL
+  ACHING
+  BURNING
+  THROBBING
+}
+
+enum ProgramStatus {
+  ACTIVE
+  COMPLETED
+  PAUSED
+}
+
+// ─────────────────────────────────────────────
+// NextAuth Models
+// ─────────────────────────────────────────────
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+  @@index([userId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+// ─────────────────────────────────────────────
+// Core User Model
+// ─────────────────────────────────────────────
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  name      String?
+  password  String?
+  role      UserRole @default(ATHLETE)
+  image     String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // NextAuth relations
+  accounts Account[]
+  sessions Session[]
+
+  // App relations
+  athleteProfile     AthleteProfile?
+  athleteEvaluations MovementEvaluation[] @relation("AthleteEvaluations")
+  coachEvaluations   MovementEvaluation[] @relation("CoachEvaluations")
+  athletePrograms    ExerciseProgram[]    @relation("AthletePrograms")
+  coachPrograms      ExerciseProgram[]    @relation("CoachPrograms")
+  bodyMapEntries     BodyMapEntry[]
+  programSessions    ProgramSession[]
+  performanceMetrics PerformanceMetric[]
+
+  @@index([email])
+  @@index([role])
+}
+
+// ─────────────────────────────────────────────
+// Athlete Profile
+// ─────────────────────────────────────────────
+
+model AthleteProfile {
+  id           String        @id @default(cuid())
+  userId       String        @unique
+  dateOfBirth  DateTime?
+  sport        String?
+  position     String?
+  height       Float?        // in cm
+  weight       Float?        // in kg
+  dominantSide DominantSide?
+  injuryHistory Json?         // Array of past injury records
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+// ─────────────────────────────────────────────
+// Movement Evaluations (MHQ / AHQ)
+// ─────────────────────────────────────────────
+
+model MovementEvaluation {
+  id        String         @id @default(cuid())
+  athleteId String
+  coachId   String?
+  type      EvaluationType
+  responses Json           // Array of { questionId, value, label }
+  score     Float          // 0–100 calculated score
+  notes     String?        @db.Text
+  createdAt DateTime       @default(now())
+  updatedAt DateTime       @updatedAt
+
+  athlete User  @relation("AthleteEvaluations", fields: [athleteId], references: [id], onDelete: Cascade)
+  coach   User? @relation("CoachEvaluations", fields: [coachId], references: [id], onDelete: SetNull)
+
+  @@index([athleteId])
+  @@index([coachId])
+  @@index([type])
+  @@index([createdAt])
+}
+
+// ─────────────────────────────────────────────
+// Body Map Pain Tracking
+// ─────────────────────────────────────────────
+
+model BodyMapEntry {
+  id        String   @id @default(cuid())
+  athleteId String
+  bodyPart  String   // e.g. "left_knee", "right_shoulder"
+  side      BodySide
+  painLevel Int      // 1–10
+  painType  PainType
+  notes     String?  @db.Text
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  athlete User @relation(fields: [athleteId], references: [id], onDelete: Cascade)
+
+  @@index([athleteId])
+  @@index([createdAt])
+  @@index([bodyPart])
+}
+
+// ─────────────────────────────────────────────
+// Exercise Programs
+// ─────────────────────────────────────────────
+
+model ExerciseProgram {
+  id        String        @id @default(cuid())
+  name      String
+  athleteId String
+  coachId   String?
+  status    ProgramStatus @default(ACTIVE)
+  exercises Json          // Array of ProgramExercise objects
+  startDate DateTime
+  endDate   DateTime?
+  notes     String?       @db.Text
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @updatedAt
+
+  athlete  User             @relation("AthletePrograms", fields: [athleteId], references: [id], onDelete: Cascade)
+  coach    User?            @relation("CoachPrograms", fields: [coachId], references: [id], onDelete: SetNull)
+  sessions ProgramSession[]
+
+  @@index([athleteId])
+  @@index([coachId])
+  @@index([status])
+  @@index([startDate])
+}
+
+// ─────────────────────────────────────────────
+// Program Sessions (completed workout logs)
+// ─────────────────────────────────────────────
+
+model ProgramSession {
+  id          String   @id @default(cuid())
+  programId   String
+  athleteId   String
+  completedAt DateTime @default(now())
+  duration    Int?     // in minutes
+  rpe         Int?     // 1–10 Rate of Perceived Exertion
+  notes       String?  @db.Text
+  exercises   Json     // Array of { exerciseId, name, sets: [{ reps, weight, completed }] }
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  program ExerciseProgram @relation(fields: [programId], references: [id], onDelete: Cascade)
+  athlete User            @relation(fields: [athleteId], references: [id], onDelete: Cascade)
+
+  @@index([programId])
+  @@index([athleteId])
+  @@index([completedAt])
+}
+
+// ─────────────────────────────────────────────
+// Performance Metrics
+// ─────────────────────────────────────────────
+
+model PerformanceMetric {
+  id         String   @id @default(cuid())
+  athleteId  String
+  metricType String   // e.g. "jump_height", "sprint_time", "vo2_max"
+  value      Float
+  unit       String   // e.g. "cm", "seconds", "ml/kg/min"
+  recordedAt DateTime @default(now())
+  notes      String?  @db.Text
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  athlete User @relation(fields: [athleteId], references: [id], onDelete: Cascade)
+
+  @@index([athleteId])
+  @@index([metricType])
+  @@index([recordedAt])
+}
