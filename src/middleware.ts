@@ -35,6 +35,7 @@ export async function middleware(request: NextRequest) {
   // ── Rutas privadas: requieren sesión ──────────────────────────────────────
   const isPrivate =
     pathname.startsWith('/informe') ||
+    pathname.startsWith('/prehab/informe') ||
     pathname.startsWith('/perfil') ||
     pathname.startsWith('/admin')
 
@@ -62,8 +63,11 @@ export async function middleware(request: NextRequest) {
   }
 
   // ── Rutas públicas con sesión activa ──────────────────────────────────────
-  // Si el usuario ya está logueado y va a /registro, redirigir al perfil
-  if (pathname === '/registro' && user) {
+  // Si el usuario ya está logueado y va a /registro sin datos pendientes, redirigir al perfil
+  // Excepción: si viene de prehab (?from=prehab) o del cuestionario (?next=...) permitir el registro
+  const fromParam = request.nextUrl.searchParams.get('from')
+  const nextParam = request.nextUrl.searchParams.get('next')
+  if (pathname === '/registro' && user && !fromParam && !nextParam) {
     const url = request.nextUrl.clone()
     url.pathname = '/perfil'
     return NextResponse.redirect(url)

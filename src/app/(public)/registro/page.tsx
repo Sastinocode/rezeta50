@@ -4,9 +4,10 @@ import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { useQuestionnaireStore } from '@/store/questionnaireStore'
+import { usePrehabStore } from '@/store/prehabStore'
 import { saveQuestionnaire } from '@/lib/questionnaire/save'
 import { cn } from '@/lib/utils'
 import { Loader2, Eye, EyeOff, AlertCircle } from 'lucide-react'
@@ -27,12 +28,48 @@ const loginSchema = z.object({
 type RegisterData = z.infer<typeof registerSchema>
 type LoginData    = z.infer<typeof loginSchema>
 
+// ── Helper: guardar prehab y redirigir ────────────────────────────────────────
+
+async function savePrehab(
+  userId: string,
+  prehabState: ReturnType<typeof usePrehabStore.getState>
+): Promise<string> {
+  const res = await fetch('/api/generate-prehab-report', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      sport:        prehabState.sport,
+      ageRange:     prehabState.ageRange,
+      level:        prehabState.level,
+      season:       prehabState.season,
+      trainingDays: prehabState.trainingDays,
+      intensity:    prehabState.intensity,
+      sessionHours: prehabState.sessionHours,
+      goals:        prehabState.goals,
+      injuryZones:  prehabState.injuryZones,
+      sorenessZones: prehabState.sorenessZones,
+    }),
+  })
+
+  if (!res.ok) {
+    const data = await res.json()
+    throw new Error(data.error ?? 'Error generando informe PREHAB')
+  }
+
+  const { report_id } = await res.json()
+  return report_id as string
+}
+
 // ── Componente principal ──────────────────────────────────────────────────────
 
 export default function RegistroPage() {
-  const router     = useRouter()
-  const supabase   = createClient()
-  const storeState = useQuestionnaireStore()
+  const router        = useRouter()
+  const searchParams  = useSearchParams()
+  const fromPrehab    = searchParams.get('from') === 'prehab'
+
+  const supabase      = createClient()
+  const storeState    = useQuestionnaireStore()
+  const prehabState   = usePrehabStore()
 
   const [tab,          setTab]          = useState<'register' | 'login'>('register')
   const [showPassword, setShowPassword] = useState(false)
@@ -72,6 +109,24 @@ export default function RegistroPage() {
       : 'border-slate-300 focus:border-[#F4DF49] focus:ring-[#F4DF49]/20'
   )
 
+  // ── Lógica post-auth ─────────────────────────────────────────────────────
+
+  const postAuth = async (userId: string) => {
+    if (fromPrehab) {
+      setLoadingPhase('saving')
+      const reportId = await savePrehab(userId, prehabState)
+      setLoadingPhase('report')
+      prehabState.reset()
+      router.push(`/prehab/informe/${reportId}`)
+    } else {
+      setLoadingPhase('saving')
+      const reportId = await saveQuestionnaire(userId, storeState)
+      setLoadingPhase('report')
+      storeState.reset()
+      router.push(`/informe/${reportId}`)
+    }
+  }
+
   // ── Handler registro ─────────────────────────────────────────────────────
 
   const handleRegister = async (data: RegisterData) => {
@@ -92,11 +147,7 @@ export default function RegistroPage() {
         return
       }
 
-      setLoadingPhase('saving')
-      const reportId = await saveQuestionnaire(authData.user.id, storeState)
-      setLoadingPhase('report')
-      storeState.reset()
-      router.push(`/informe/${reportId}`)
+      await postAuth(authData.user.id)
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : 'Error inesperado'
       if (msg.includes('already registered') || msg.includes('User already registered')) {
@@ -122,7 +173,13 @@ export default function RegistroPage() {
       if (error) throw error
       if (!authData.user) throw new Error('No se pudo iniciar sesión')
 
-      if (storeState.selectedZones.length > 0 && storeState.currentStep === 'complete') {
+      if (fromPrehab) {
+        setLoadingPhase('saving')
+        const reportId = await savePrehab(authData.user.id, prehabState)
+        setLoadingPhase('report')
+        prehabState.reset()
+        router.push(`/prehab/informe/${reportId}`)
+      } else if (storeState.selectedZones.length > 0 && storeState.currentStep === 'complete') {
         const reportId = await saveQuestionnaire(authData.user.id, storeState)
         storeState.reset()
         router.push(`/informe/${reportId}`)
@@ -150,15 +207,24 @@ export default function RegistroPage() {
         <span className="text-xs font-bold px-1.5 py-0.5 rounded" style={{ background: '#F4DF49', color: '#111111' }}>
           50
         </span>
+        {fromPrehab && (
+          <span className="text-xs text-slate-400 ml-1 font-medium">PREHAB</span>
+        )}
       </header>
 
       <main className="flex-1 flex items-start justify-center pt-8 px-4 pb-12">
         <div className="w-full max-w-sm">
 
           <div className="text-center mb-6">
-            <div className="text-4xl mb-3">🎉</div>
-            <h1 className="text-2xl font-black text-[#111111] leading-tight">Tu valoración está lista.</h1>
-            <p className="text-slate-500 text-sm mt-2">Crea tu cuenta gratis para ver tus resultados.</p>
+            <div className="text-4xl mb-3">{fromPrehab ? '⚡' : '🎉'}</div>
+            <h1 className="text-2xl font-black text-[#111111] leading-tight">
+              {fromPrehab ? 'Tu Athlete Health Score está listo.' : 'Tu valoración está lista.'}
+            </h1>
+            <p className="text-slate-500 text-sm mt-2">
+              {fromPrehab
+                ? 'Crea tu cuenta gratis para ver tu informe PREHAB.'
+                : 'Crea tu cuenta gratis para ver tus resultados.'}
+            </p>
           </div>
 
           {/* Email pendiente */}
@@ -285,7 +351,7 @@ export default function RegistroPage() {
                         <>
                           <Loader2 size={18} className="animate-spin" />
                           {loadingPhase === 'auth'   && 'Creando cuenta…'}
-                          {loadingPhase === 'saving' && 'Guardando valoración…'}
+                          {loadingPhase === 'saving' && 'Guardando datos…'}
                           {loadingPhase === 'report' && 'Generando informe…'}
                         </>
                       ) : (
