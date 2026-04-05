@@ -2,6 +2,11 @@ import { createServerClient } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
 
 export async function middleware(request: NextRequest) {
+  // Skip Supabase entirely if keys are not configured yet
+  if (!process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
+    return NextResponse.next({ request })
+  }
+
   let supabaseResponse = NextResponse.next({ request })
 
   const supabase = createServerClient(
@@ -36,30 +41,13 @@ export async function middleware(request: NextRequest) {
   const isPrivate =
     pathname.startsWith('/informe') ||
     pathname.startsWith('/prehab/informe') ||
-    pathname.startsWith('/perfil') ||
-    pathname.startsWith('/admin')
+    pathname.startsWith('/perfil')
 
   if (isPrivate && !user) {
     const url = request.nextUrl.clone()
     url.pathname = '/registro'
     url.searchParams.set('next', pathname)
     return NextResponse.redirect(url)
-  }
-
-  // ── Rutas admin: verificar rol en user_roles ──────────────────────────────
-  if (pathname.startsWith('/admin') && user) {
-    const { data: roleRow } = await supabase
-      .from('user_roles')
-      .select('role')
-      .eq('user_id', user.id)
-      .eq('role', 'admin')
-      .maybeSingle()
-
-    if (!roleRow) {
-      const url = request.nextUrl.clone()
-      url.pathname = '/perfil'
-      return NextResponse.redirect(url)
-    }
   }
 
   // ── Rutas públicas con sesión activa ──────────────────────────────────────

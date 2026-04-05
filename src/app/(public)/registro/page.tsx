@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { Suspense, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
@@ -63,6 +63,14 @@ async function savePrehab(
 // ── Componente principal ──────────────────────────────────────────────────────
 
 export default function RegistroPage() {
+  return (
+    <Suspense>
+      <RegistroForm />
+    </Suspense>
+  )
+}
+
+function RegistroForm() {
   const router        = useRouter()
   const searchParams  = useSearchParams()
   const fromPrehab    = searchParams.get('from') === 'prehab'

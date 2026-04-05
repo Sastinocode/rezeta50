@@ -1,7 +1,12 @@
 import { createServerClient } from '@supabase/ssr'
 import { cookies } from 'next/headers'
-import type { Database } from '@/types/database'
+import { createClient as createSupabaseClient } from '@supabase/supabase-js'
+import type { Database } from '@/lib/supabase/types'
 
+/**
+ * Cliente server con contexto de cookies del usuario (respeta RLS).
+ * Usar en Server Components, Route Handlers y Server Actions.
+ */
 export function createClient() {
   const cookieStore = cookies()
 
@@ -24,5 +29,17 @@ export function createClient() {
         },
       },
     }
+  )
+}
+
+/**
+ * Cliente con service role key — bypasea RLS.
+ * SOLO usar en operaciones administrativas server-side.
+ * NUNCA exponer al cliente browser.
+ */
+export function createServiceClient() {
+  return createSupabaseClient<Database>(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!
   )
 }
